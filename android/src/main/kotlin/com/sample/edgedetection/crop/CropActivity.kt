@@ -49,13 +49,14 @@ class CropActivity : BaseActivity(), ICropView.Proxy {
             changeMenuVisibility(true)
         }
         findViewById<ImageView>(R.id.skip).setOnClickListener {
-            mPresenter.skip(this)
-            setResult(Activity.RESULT_OK)
-            System.gc()
-            if(ScanActivity.pickFromGallary){
-               finishAffinity()
-            }else {
+            try {
+                mPresenter.skip(this)
+                setResult(Activity.RESULT_OK)
+                System.gc()
                 finish()
+            }catch (e: Exception) {
+                Log.e(TAG, "Skip error: ${e.message}")
+
             }
         }
     }
