@@ -81,6 +81,7 @@ class ScanActivity : BaseActivity(), IScanView.Proxy {
 
         if (initialBundle.containsKey(EdgeDetectionHandler.FROM_GALLERY) && initialBundle.getBoolean(EdgeDetectionHandler.FROM_GALLERY,false))
         {
+            pickFromGallary = true
             pickupFromGallery()
         }
     }
@@ -239,4 +240,9 @@ class ScanActivity : BaseActivity(), IScanView.Proxy {
         }
         return byteBuffer.toByteArray()
     }
+
+    companion object {
+        var pickFromGallary: Boolean= false
+    }
+
 }

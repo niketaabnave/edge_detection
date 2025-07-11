@@ -297,9 +297,10 @@ class ScanPresenter constructor(
     }
 
     override fun onPreviewFrame(p0: ByteArray?, p1: Camera?) {
-        if (busy) {
+        if (busy || ScanActivity.pickFromGallary) {
             return
         }
+
         busy = true
         try {
             Observable.just(p0)
