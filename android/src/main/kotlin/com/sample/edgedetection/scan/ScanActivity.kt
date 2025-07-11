@@ -140,6 +140,9 @@ class ScanActivity : BaseActivity(), IScanView.Proxy {
                 }
             }else if(resultCode == Activity.RESULT_CANCELED){
                 mPresenter.start()
+                if(pickFromGallary){
+                    finish()
+                }
             }else if(resultCode == SKIP_CODE){
                 setResult(Activity.RESULT_OK)
                 finish()
