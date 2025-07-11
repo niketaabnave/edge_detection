@@ -51,9 +51,7 @@ class CropActivity : BaseActivity(), ICropView.Proxy {
         findViewById<ImageView>(R.id.skip).setOnClickListener {
             try {
                 mPresenter.skip(this)
-                setResult(Activity.RESULT_OK)
-                System.gc()
-                finish()
+                changeMenuVisibility(true)
             }catch (e: Exception) {
                 Log.e(TAG, "Skip error: ${e.message}")
 

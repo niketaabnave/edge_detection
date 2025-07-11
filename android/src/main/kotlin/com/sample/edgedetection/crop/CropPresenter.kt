@@ -143,28 +143,13 @@ class CropPresenter(
     }
 
     fun skip(context: Context) {
-        val file = File(initialBundle.getString(EdgeDetectionHandler.SAVE_TO) as String)
-        val inputUri = SourceManager.orgianlPic
+        croppedBitmap =
+            Bitmap.createBitmap(SourceManager.originalMat!!.width(), SourceManager.originalMat!!.height(), Bitmap.Config.ARGB_8888)
+        Utils.matToBitmap(SourceManager.originalMat!!, croppedBitmap)
+        iCropView.getCroppedPaper().setImageBitmap(croppedBitmap)
+        iCropView.getPaper().visibility = View.GONE
+        iCropView.getPaperRect().visibility = View.GONE
 
-        try {
-            val inputStream: InputStream? = context.contentResolver.openInputStream(inputUri!!)
-            if (inputStream != null) {
-                val outputStream = FileOutputStream(file)
-                inputStream.copyTo(outputStream)
-                inputStream.close()
-                outputStream.flush()
-                outputStream.close()
-                Log.i("TAG", "File copied to: ${file.absolutePath}")
-            } else {
-                Log.e("TAG", "Unable to open input stream from URI")
-            }
-        } catch (e: SecurityException) {
-            Log.e("TAG", "SecurityException: Cannot access URI", e)
-        } catch (e: FileNotFoundException) {
-            Log.e("TAG", "FileNotFoundException: File missing", e)
-        }catch (e: Exception) {
-            Log.e("TAG", "Exception: Unknown", e)
-        }
     }
 
 
