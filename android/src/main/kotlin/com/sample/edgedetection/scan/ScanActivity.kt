@@ -14,7 +14,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.exifinterface.media.ExifInterface
 import com.sample.edgedetection.ERROR_CODE
-import com.sample.edgedetection.EdgeDetectionHandler
+import com.sample.edgedetection.MainActivity.EdgeDetectionHandler
 import com.sample.edgedetection.R
 import com.sample.edgedetection.REQUEST_CODE
 import com.sample.edgedetection.SKIP_CODE
@@ -86,6 +86,7 @@ class ScanActivity : BaseActivity(), IScanView.Proxy {
     }
 
     private fun pickupFromGallery() {
+        pickFromGallary = true
         mPresenter.stop()
         val gallery = Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply{type="image/*"}
         ActivityCompat.startActivityForResult(this, gallery, 1, null)
@@ -238,5 +239,9 @@ class ScanActivity : BaseActivity(), IScanView.Proxy {
             byteBuffer.write(buffer, 0, len)
         }
         return byteBuffer.toByteArray()
+    }
+
+    companion object {
+        var pickFromGallary: Boolean= false
     }
 }

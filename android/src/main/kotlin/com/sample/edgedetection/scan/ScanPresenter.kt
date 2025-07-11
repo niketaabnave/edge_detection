@@ -18,7 +18,7 @@ import android.util.Log
 import android.view.Display
 import android.view.SurfaceHolder
 import android.widget.Toast
-import com.sample.edgedetection.EdgeDetectionHandler
+import com.sample.edgedetection.MainActivity.EdgeDetectionHandler
 import com.sample.edgedetection.REQUEST_CODE
 import com.sample.edgedetection.SourceManager
 import com.sample.edgedetection.crop.CropActivity
@@ -297,7 +297,7 @@ class ScanPresenter constructor(
     }
 
     override fun onPreviewFrame(p0: ByteArray?, p1: Camera?) {
-        if (busy) {
+        if (busy || ScanActivity.pickFromGallary) {
             return
         }
         busy = true
@@ -306,6 +306,7 @@ class ScanPresenter constructor(
                 .observeOn(proxySchedule)
                 .doOnError {}
                 .subscribe({
+                    Log.i(TAG, "onPreviewFrame")
                     val parameters = p1?.parameters
                     val width = parameters?.previewSize?.width
                     val height = parameters?.previewSize?.height
@@ -333,10 +334,12 @@ class ScanPresenter constructor(
                         if (null != corner && corner.corners.size == 4) {
                             it.onNext(corner)
                         } else {
+                            Log.e(TAG, "paper not detected")
                             it.onError(Throwable("paper not detected"))
                         }
                     }.observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
+                            Log.i(TAG, "corners detected: ${it.corners.size}")
                             iView.getPaperRect().onCornersDetected(it)
 
                         }, {

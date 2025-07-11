@@ -7,7 +7,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
-import com.sample.edgedetection.EdgeDetectionHandler
+import com.sample.edgedetection.MainActivity.EdgeDetectionHandler
 import com.sample.edgedetection.R
 import com.sample.edgedetection.base.BaseActivity
 import com.sample.edgedetection.view.PaperRectangle

@@ -5,7 +5,7 @@ import android.graphics.Matrix
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import com.sample.edgedetection.EdgeDetectionHandler
+import com.sample.edgedetection.MainActivity.EdgeDetectionHandler
 import com.sample.edgedetection.SourceManager
 import com.sample.edgedetection.processor.Corners
 import com.sample.edgedetection.processor.TAG
