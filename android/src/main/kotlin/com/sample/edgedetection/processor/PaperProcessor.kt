@@ -75,71 +75,41 @@ fun enhancePicture(src: Bitmap?): Bitmap {
 }
 
 private fun findContours(src: Mat): List<MatOfPoint> {
-    // Add padding to help detect contours touching image edges
-    val padded = Mat()
-    Core.copyMakeBorder(src, padded, 10, 10, 10, 10, Core.BORDER_CONSTANT, Scalar(255.0, 255.0, 255.0))
 
-    // Prepare Mats
-    val grayImage = Mat()
-    val cannedImage = Mat()
-    val dilatedImage = Mat()
-    val kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, Size(3.0, 3.0)) // Smaller kernel
+    val grayImage: Mat
+    val cannedImage: Mat
+    val kernel: Mat = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, Size(9.0, 9.0))
+    val dilate: Mat
+    val size = Size(src.size().width, src.size().height)
+    grayImage = Mat(size, CvType.CV_8UC4)
+    cannedImage = Mat(size, CvType.CV_8UC1)
+    dilate = Mat(size, CvType.CV_8UC1)
 
-    // Convert to grayscale
-    Imgproc.cvtColor(padded, grayImage, Imgproc.COLOR_BGR2GRAY)
-
-    // Apply CLAHE for better local contrast
-    val clahe = Imgproc.createCLAHE()
-    clahe.clipLimit = 4.0
-    clahe.apply(grayImage, grayImage)
-
-    // Optional Gaussian blur
+    Imgproc.cvtColor(src, grayImage, Imgproc.COLOR_BGR2GRAY)
     Imgproc.GaussianBlur(grayImage, grayImage, Size(5.0, 5.0), 0.0)
-
-    // Adaptive threshold (better for uneven lighting)
-    Imgproc.adaptiveThreshold(
-        grayImage,
-        grayImage,
-        255.0,
-        Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,
-        Imgproc.THRESH_BINARY,
-        11,
-        2.0
-    )
-
-    // Edge detection
-    Imgproc.Canny(grayImage, cannedImage, 50.0, 150.0)
-
-    // Dilation to strengthen edges
-    Imgproc.dilate(cannedImage, dilatedImage, kernel)
-
-    // Find contours
+    Imgproc.threshold(grayImage, grayImage, 20.0, 255.0, Imgproc.THRESH_TRIANGLE)
+    Imgproc.Canny(grayImage, cannedImage, 75.0, 200.0)
+    Imgproc.dilate(cannedImage, dilate, kernel)
     val contours = ArrayList<MatOfPoint>()
     val hierarchy = Mat()
     Imgproc.findContours(
-        dilatedImage,
+        dilate,
         contours,
         hierarchy,
-        Imgproc.RETR_EXTERNAL,  // Only outer contours
+        Imgproc.RETR_TREE,
         Imgproc.CHAIN_APPROX_SIMPLE
     )
 
-    // Filter contours based on area relative to image size
-    val imageArea = padded.size().area()
-    val minArea = 0.05 * imageArea  // Filter out very small contours
-
     val filteredContours = contours
-        .filter { p -> Imgproc.contourArea(p) > minArea }
-        .sortedByDescending { p -> Imgproc.contourArea(p) }
+        .filter { p: MatOfPoint -> Imgproc.contourArea(p) > 100e2 }
+        .sortedByDescending { p: MatOfPoint -> Imgproc.contourArea(p) }
         .take(25)
 
-    // Release memory
+    hierarchy.release()
     grayImage.release()
     cannedImage.release()
-    dilatedImage.release()
     kernel.release()
-    hierarchy.release()
-    padded.release()
+    dilate.release()
 
     return filteredContours
 }
