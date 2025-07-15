@@ -245,6 +245,7 @@ class ScanPresenter constructor(
         }
     }
     fun detectEdge(pic: Mat) {
+        SourceManager.originalMat = pic
         Log.i("height", pic.size().height.toString())
         Log.i("width", pic.size().width.toString())
         val resizedMat = matrixResizer(pic)
@@ -290,6 +291,7 @@ class ScanPresenter constructor(
                 val pic = Imgcodecs.imdecode(mat, Imgcodecs.CV_LOAD_IMAGE_UNCHANGED)
                 Core.rotate(pic, pic, Core.ROTATE_90_CLOCKWISE)
                 mat.release()
+
                 detectEdge(pic)
                 shutted = true
                 busy = false
@@ -300,6 +302,7 @@ class ScanPresenter constructor(
         if (busy || ScanActivity.pickFromGallary) {
             return
         }
+
         busy = true
         try {
             Observable.just(p0)

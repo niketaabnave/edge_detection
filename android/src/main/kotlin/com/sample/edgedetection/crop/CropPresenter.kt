@@ -20,6 +20,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import android.content.Context
+import java.io.FileNotFoundException
 
 class CropPresenter(
     private val iCropView: ICropView.Proxy,
@@ -141,25 +142,16 @@ class CropPresenter(
         croppedBitmap = croppedBitmap?.rotateInt(rotateBitmapDegree)
     }
 
-fun skip(context: Context) {
-        val file = File(initialBundle.getString(EdgeDetectionHandler.SAVE_TO) as String)
+    fun skip(context: Context) {
+        croppedBitmap =
+            Bitmap.createBitmap(SourceManager.originalMat!!.width(), SourceManager.originalMat!!.height(), Bitmap.Config.ARGB_8888)
+        Utils.matToBitmap(SourceManager.originalMat!!, croppedBitmap)
+        iCropView.getCroppedPaper().setImageBitmap(croppedBitmap)
+        iCropView.getPaper().visibility = View.GONE
+        iCropView.getPaperRect().visibility = View.GONE
 
-        val inputUri = SourceManager.orgianlPic
-           
-        val inputStream: InputStream? = context.contentResolver.openInputStream(inputUri!!)
-        if (inputStream != null) {
-            val outputStream = FileOutputStream(file)
-            inputStream.copyTo(outputStream)
-            inputStream.close()
-            outputStream.flush()
-            outputStream.close()
-            Log.i("TAG", "File copied to: ${file.absolutePath}")
-        } else {
-            Log.e("TAG", "Unable to open input stream from URI")
-        }
-            
-        
     }
+
 
     fun save() {
         val file = File(initialBundle.getString(EdgeDetectionHandler.SAVE_TO) as String)

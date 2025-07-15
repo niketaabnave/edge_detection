@@ -13,6 +13,7 @@ import com.sample.edgedetection.base.BaseActivity
 import com.sample.edgedetection.view.PaperRectangle
 import com.sample.edgedetection.SourceManager
 import com.sample.edgedetection.SKIP_CODE
+import com.sample.edgedetection.scan.ScanActivity
 
 
 class CropActivity : BaseActivity(), ICropView.Proxy {
@@ -48,17 +49,13 @@ class CropActivity : BaseActivity(), ICropView.Proxy {
             changeMenuVisibility(true)
         }
         findViewById<ImageView>(R.id.skip).setOnClickListener {
-            Log.e(TAG, "Skip touched! ${SourceManager.orgianlPic})")
-            Log.e(TAG, "Activity.RESULT_OK ${Activity.RESULT_OK})")
-            // Return the original image path to the calling activity
-            // val resultIntent = intent
-            // resultIntent.putExtra(EdgeDetectionHandler.SAVE_TO, SourceManager.orgianlPic.toString())
-            // setResult(SKIP_CODE, resultIntent)
-            // finish()
+            try {
                 mPresenter.skip(this)
-                setResult(Activity.RESULT_OK)
-                System.gc()
-                finish()
+                changeMenuVisibility(true)
+            }catch (e: Exception) {
+                Log.e(TAG, "Skip error: ${e.message}")
+
+            }
         }
     }
 
@@ -131,6 +128,11 @@ class CropActivity : BaseActivity(), ICropView.Proxy {
                 return true
             }
             else -> return super.onOptionsItemSelected(item)
+        }
+    }
+    override fun onBackPressed() {
+        if (ScanActivity.pickFromGallary) {
+            finishAffinity()
         }
     }
 }

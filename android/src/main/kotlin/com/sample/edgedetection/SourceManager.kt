@@ -10,5 +10,6 @@ class SourceManager {
         var pic: Mat? = null
         var corners: Corners? = null
         var orgianlPic: Uri? = null
+        var originalMat: Mat? = null
     }
 }
