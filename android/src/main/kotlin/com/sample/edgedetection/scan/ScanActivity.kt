@@ -4,10 +4,12 @@ import com.sample.edgedetection.SourceManager
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.*
 import androidx.annotation.RequiresApi
@@ -21,6 +23,7 @@ import com.sample.edgedetection.SKIP_CODE
 import com.sample.edgedetection.base.BaseActivity
 import com.sample.edgedetection.view.PaperRectangle
 import org.opencv.android.OpenCVLoader
+import org.opencv.android.Utils
 import org.opencv.core.Core
 import org.opencv.core.CvType
 import org.opencv.core.Mat
@@ -165,6 +168,8 @@ class ScanActivity : BaseActivity(), IScanView.Proxy {
     @RequiresApi(Build.VERSION_CODES.P)
     fun onImageSelected(imageUri: Uri) {
         try {
+
+
             Log.d(TAG, "onImageSelected: $imageUri")
             val iStream: InputStream = contentResolver.openInputStream(imageUri)!!
             Log.d(TAG, "InputStream opened successfully for URI: $imageUri")
@@ -217,9 +222,23 @@ class ScanActivity : BaseActivity(), IScanView.Proxy {
             mat.put(0, 0, inputData)
             val pic = Imgcodecs.imdecode(mat, Imgcodecs.IMREAD_UNCHANGED)
             Log.d(TAG, "Image decoded successfully, applying rotation if needed")
+
+            val source = ImageDecoder.createSource(contentResolver, imageUri)
+            val bitmap = ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
+                decoder.isMutableRequired = true
+            }
+            val tempPic = Mat()
+            Utils.bitmapToMat(bitmap, tempPic)  // Convert Bitmap to Mat (color preserved)
+
             if (rotation > -1) Core.rotate(pic, pic, rotation)
+
+            // Now `tempPic` is the color-accurate image
+            SourceManager.originalMat = tempPic
+
+
             mat.release()
             Log.d(TAG, "Image rotation applied, starting edge detection")
+
             mPresenter.detectEdge(pic)
             Log.d(TAG, "Edge detection started successfully")
         } catch (error: Exception) {

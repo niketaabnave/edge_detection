@@ -143,13 +143,21 @@ class CropPresenter(
     }
 
     fun skip(context: Context) {
-        croppedBitmap =
-            Bitmap.createBitmap(SourceManager.originalMat!!.width(), SourceManager.originalMat!!.height(), Bitmap.Config.ARGB_8888)
-        Utils.matToBitmap(SourceManager.originalMat!!, croppedBitmap)
-        iCropView.getCroppedPaper().setImageBitmap(croppedBitmap)
-        iCropView.getPaper().visibility = View.GONE
-        iCropView.getPaperRect().visibility = View.GONE
+        try {
+            croppedBitmap =
+                Bitmap.createBitmap(
+                    SourceManager.originalMat!!.width(),
+                    SourceManager.originalMat!!.height(),
+                    Bitmap.Config.ARGB_8888
+                )
+            Utils.matToBitmap(SourceManager.originalMat!!, croppedBitmap)
+            iCropView.getCroppedPaper().setImageBitmap(croppedBitmap)
+            iCropView.getPaper().visibility = View.GONE
+            iCropView.getPaperRect().visibility = View.GONE
 
+        }catch (e: Exception) {
+            Log.i(TAG, "Skip error: $e")
+        }
     }
 
 

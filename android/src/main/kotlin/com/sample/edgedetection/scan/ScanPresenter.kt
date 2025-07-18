@@ -245,7 +245,7 @@ class ScanPresenter constructor(
         }
     }
     fun detectEdge(pic: Mat) {
-        SourceManager.originalMat = pic
+
         Log.i("height", pic.size().height.toString())
         Log.i("width", pic.size().width.toString())
         val resizedMat = matrixResizer(pic)
@@ -279,6 +279,19 @@ class ScanPresenter constructor(
         Observable.just(p0)
             .subscribeOn(proxySchedule)
             .subscribe {
+
+                val bitmap = p0?.let { it1 -> BitmapFactory.decodeByteArray(p0, 0, it1.size) }
+                if (bitmap == null) {
+                    Log.e(TAG, "Bitmap decode failed")
+                    return@subscribe
+                }
+
+                // Convert Bitmap to OpenCV Mat
+                val tempMat = Mat()
+                Utils.bitmapToMat(bitmap, tempMat)
+                Core.rotate(tempMat, tempMat, Core.ROTATE_90_CLOCKWISE)
+                SourceManager.originalMat = tempMat
+
                 val pictureSize = p1?.parameters?.pictureSize
                 Log.i(TAG, "picture size: " + pictureSize.toString())
                 val mat = Mat(
@@ -288,10 +301,12 @@ class ScanPresenter constructor(
                     ), CvType.CV_8U
                 )
                 mat.put(0, 0, p0)
+
+
                 val pic = Imgcodecs.imdecode(mat, Imgcodecs.CV_LOAD_IMAGE_UNCHANGED)
                 Core.rotate(pic, pic, Core.ROTATE_90_CLOCKWISE)
-                mat.release()
 
+                mat.release()
                 detectEdge(pic)
                 shutted = true
                 busy = false
